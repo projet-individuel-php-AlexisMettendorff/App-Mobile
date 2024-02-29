@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:mysql1/mysql1.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:meteo/models/city.dart';
@@ -55,12 +55,21 @@ class _HomePageState extends State<HomePage> {
                           backgroundColor:
                               MaterialStateProperty.all<Color>(Colors.white)),
                     ),
+                    ElevatedButton(
+                      onPressed: getDataFromDatabase,
+                      child: Text(
+                        "Rechercher un tournoi",
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                      style: ButtonStyle(
+                          backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.white)),
+                    ),
                   ],
                 )),
                 ListTile(
                   onTap: null,
-                  title: Text(
-                    DeviceInfo.ville ?? "Position Inconnue",
+                  title: Text("Votre liste de tournois",
                     style: TextStyle(color: Colors.white),
                     textAlign: TextAlign.center,
                   ),
@@ -143,6 +152,33 @@ class _HomePageState extends State<HomePage> {
       await prefs.setString("villes", jsonEncode(jsonList));
       await getVilles(); // Récupère + refresh VUE
     }
+  }
+  Future<List<Map<String, dynamic>>> getDataFromDatabase() async {
+    final conn = await MySqlConnection.connect(ConnectionSettings(
+      host: '192.168.1.99',
+      port: 3306,
+      user: 'android',
+      password: 'android',
+      db: 'venues_db',
+    ));
+
+    var results = await conn.query('SELECT * FROM tournaments');
+    List<Map<String, dynamic>> data = [];
+
+    for (var row in results) {
+      data.add(row.fields);
+    }
+
+    await conn.close();
+    print(data);
+    return data;
+
+  }
+
+  void main() async {
+    List<Map<String, dynamic>> jsonData = await getDataFromDatabase();
+    String jsonString = jsonEncode(jsonData);
+    print(jsonString);
   }
 
   Future<void> ajoutVille() {
