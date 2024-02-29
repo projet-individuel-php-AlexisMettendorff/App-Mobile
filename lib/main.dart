@@ -28,10 +28,10 @@ void main() async{
     }
   }
 
-  _locationData = await location.getLocation();
-  DeviceInfo.longitude = _locationData.longitude;
-  DeviceInfo.latitude = _locationData.latitude;
-  DeviceInfo.ville = await GeocoderService.getCityFromCoordinates(latitude: _locationData.latitude!, longitude: _locationData.longitude!);
+  //_locationData = await location.getLocation();
+  //DeviceInfo.longitude = _locationData.longitude;
+  //DeviceInfo.latitude = _locationData.latitude;
+  //DeviceInfo.ville = await GeocoderService.getCityFromCoordinates(latitude: _locationData.latitude!, longitude: _locationData.longitude!);
 
 
   runApp(const MyApp());
@@ -44,6 +44,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

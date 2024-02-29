@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:meteo/models/city.dart';
 import 'package:meteo/models/device_info.dart';
+import 'package:meteo/pages/map_page.dart';
 import 'package:meteo/services/geocoder_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,7 +21,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     print("${DeviceInfo.latitude},${DeviceInfo.longitude}");
     getVilles();
@@ -29,62 +29,77 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Météo"),
-      ),
-      drawer: Drawer(
-        child: Container(
-          color: Colors.blue,
-          child: Column(
-            children: [
-              DrawerHeader(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text("Villes", style: TextStyle(fontSize:  30, color: Colors.white),),
-                      ElevatedButton(
-                        onPressed: ajoutVille,
-                        child: Text(
-                          "Ajouter une ville",
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                        style: ButtonStyle(
-                            backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.white)),
+        appBar: AppBar(
+          title: Text("Locatournoi "),
+        ),
+        drawer: Drawer(
+          child: Container(
+            color: Colors.blue,
+            child: Column(
+              children: [
+                DrawerHeader(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      "Tournois",
+                      style: TextStyle(fontSize: 30, color: Colors.white),
+                    ),
+                    ElevatedButton(
+                      onPressed: ajoutVille,
+                      child: Text(
+                        "Rechercher un tournoi",
+                        style: TextStyle(color: Colors.blue),
                       ),
-                    ],
-                  )
-              ),
-              ListTile(
-                onTap: null,
-                title: Text(DeviceInfo.ville ?? "Position Inconnue", style: TextStyle(color: Colors.white),textAlign: TextAlign.center,),
-              ),
-              Expanded(
-                  child: ListView.builder(
-                      itemCount: villes.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        City ville = villes[index];
-                        return ListTile(
-                          onTap: null,
-                          trailing: IconButton(
-                              icon: Icon(Icons.delete, color: Colors.white,),
-                              onPressed: (){
-                                supprimer(ville.name);
-                              }
-                          ),
-
-                          title: Text(ville.name, style: TextStyle(color: Colors.white),textAlign: TextAlign.center,),
-                        );
-                      })),
-            ],
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Colors.white)),
+                    ),
+                  ],
+                )),
+                ListTile(
+                  onTap: null,
+                  title: Text(
+                    DeviceInfo.ville ?? "Position Inconnue",
+                    style: TextStyle(color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Expanded(
+                    child: ListView.builder(
+                        itemCount: villes.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          City ville = villes[index];
+                          return ListTile(
+                            onTap: null,
+                            trailing: IconButton(
+                                icon: Icon(
+                                  Icons.delete,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  supprimer(ville.name);
+                                }),
+                            title: Text(
+                              ville.name,
+                              style: TextStyle(color: Colors.white),
+                              textAlign: TextAlign.center,
+                            ),
+                          );
+                        })),
+              ],
+            ),
           ),
         ),
-      ),
-    body: Column(
-        children: [
-        ],
-      ),
-    );
+        body: SingleChildScrollView(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              children: [MapPage()],
+            ),
+          ),
+        ));
   }
 
   Future<void> getVilles() async {
@@ -130,10 +145,8 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-
   Future<void> ajoutVille() {
     City? villeSaisie;
-
 
     return showDialog(
         context: context,
@@ -143,22 +156,22 @@ class _HomePageState extends State<HomePage> {
             title: Text("Ajoutez une ville"),
             children: [
               TypeAheadField<City>(
-                  itemBuilder: (context, citySuggestion){
-                    return ListTile(
-                      title: Text(citySuggestion.display_name ?? "No Suggestion"),
-                    );
-                  },
-                  onSelected: (citySelected){
-                    villeSaisie = citySelected;
-                    print(villeSaisie.toString());
-                  },
-                  suggestionsCallback: (pattern) async{
-                    if(pattern.isNotEmpty){
-                      return await GeocoderService.searchCity(pattern);
-                    }else{
-                      return [];
-                    }
-                  },
+                itemBuilder: (context, citySuggestion) {
+                  return ListTile(
+                    title: Text(citySuggestion.display_name ?? "No Suggestion"),
+                  );
+                },
+                onSelected: (citySelected) {
+                  villeSaisie = citySelected;
+                  print(villeSaisie.toString());
+                },
+                suggestionsCallback: (pattern) async {
+                  if (pattern.isNotEmpty) {
+                    return await GeocoderService.searchCity(pattern);
+                  } else {
+                    return [];
+                  }
+                },
                 builder: (context, controller, focusNode) {
                   return TextField(
                       controller: controller,
@@ -167,15 +180,14 @@ class _HomePageState extends State<HomePage> {
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Saisir une ville',
-                      )
-                  );
+                      ));
                 },
               ),
               ElevatedButton(
                   onPressed: () {
-                    if(villeSaisie != null){
-
-                      ajouter(villeSaisie!.name,villeSaisie!.latitude,villeSaisie!.longitude);
+                    if (villeSaisie != null) {
+                      ajouter(villeSaisie!.name, villeSaisie!.latitude,
+                          villeSaisie!.longitude);
                       Navigator.pop(contextDialog);
                     }
                   },
@@ -184,5 +196,4 @@ class _HomePageState extends State<HomePage> {
           );
         });
   }
-
 }
