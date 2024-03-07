@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:mysql1/mysql1.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:meteo/models/city.dart';
-import 'package:meteo/models/device_info.dart';
-import 'package:meteo/pages/map_page.dart';
-import 'package:meteo/services/geocoder_service.dart';
+import 'package:Locatournoi/models/city.dart';
+import 'package:Locatournoi/models/device_info.dart';
+import 'package:Locatournoi/pages/map_page.dart';
+import 'package:Locatournoi/services/geocoder_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,16 +29,17 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Locatournoi "),
-        ),
-        drawer: Drawer(
-          child: Container(
-            color: Colors.blue,
-            child: Column(
-              children: [
-                DrawerHeader(
-                    child: Column(
+      appBar: AppBar(
+        title: Text("Locatournoi "),
+      ),
+      drawer: Drawer(
+        child: Container(
+          color: Colors.blue,
+          child: Column(
+            children: [
+              DrawerHeader(
+                  child: SingleChildScrollView(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
@@ -46,9 +47,9 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(fontSize: 30, color: Colors.white),
                     ),
                     ElevatedButton(
-                      onPressed: ajoutVille,
+                      onPressed: ajoutTournoi,
                       child: Text(
-                        "Rechercher un tournoi",
+                        "Ajouter un tournoi",
                         style: TextStyle(color: Colors.blue),
                       ),
                       style: ButtonStyle(
@@ -58,57 +59,60 @@ class _HomePageState extends State<HomePage> {
                     ElevatedButton(
                       onPressed: getDataFromDatabase,
                       child: Text(
-                        "Rechercher un tournoi",
+                        "Liste des tournois",
                         style: TextStyle(color: Colors.blue),
                       ),
                       style: ButtonStyle(
                           backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.white)),
+                              MaterialStateProperty.all<Color>(Colors.white)),
                     ),
                   ],
-                )),
-                ListTile(
-                  onTap: null,
-                  title: Text("Votre liste de tournois",
-                    style: TextStyle(color: Colors.white),
-                    textAlign: TextAlign.center,
-                  ),
                 ),
-                Expanded(
-                    child: ListView.builder(
-                        itemCount: villes.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          City ville = villes[index];
-                          return ListTile(
-                            onTap: null,
-                            trailing: IconButton(
-                                icon: Icon(
-                                  Icons.delete,
-                                  color: Colors.white,
-                                ),
-                                onPressed: () {
-                                  supprimer(ville.name);
-                                }),
-                            title: Text(
-                              ville.name,
-                              style: TextStyle(color: Colors.white),
-                              textAlign: TextAlign.center,
-                            ),
-                          );
-                        })),
-              ],
-            ),
+              )),
+              ListTile(
+                onTap: null,
+                title: Text(
+                  "Votre liste de tournois",
+                  style: TextStyle(color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Expanded(
+                  child: ListView.builder(
+                      itemCount: villes.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        City ville = villes[index];
+                        return ListTile(
+                          onTap: null,
+                          trailing: IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                supprimer(ville.name);
+                              }),
+                          title: Text(
+                            ville.name,
+                            style: TextStyle(color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                        );
+                      })),
+            ],
           ),
         ),
-        body: SingleChildScrollView(
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: Column(
-              children: [MapPage()],
-            ),
+      ),
+      body: SingleChildScrollView(
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            children: [MapPage()],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Future<void> getVilles() async {
@@ -138,11 +142,10 @@ class _HomePageState extends State<HomePage> {
     List<Map<String, dynamic>> jsonList =
         villes.map((city) => city.toJson()).toList();
     await prefs.setString("villes", jsonEncode(jsonList));
-    await getVilles(); // Récupère + refresh VUE
+    await getVilles();
   }
 
   Future<void> supprimer(String nom) async {
-    // [ {"name":"Rouen"}, {},{}]
     int indexVille = villes.indexWhere((city) => city.name == nom);
     if (indexVille != -1) {
       villes.removeAt(indexVille);
@@ -150,12 +153,13 @@ class _HomePageState extends State<HomePage> {
       List<Map<String, dynamic>> jsonList =
           villes.map((city) => city.toJson()).toList();
       await prefs.setString("villes", jsonEncode(jsonList));
-      await getVilles(); // Récupère + refresh VUE
+      await getVilles();
     }
   }
+
   Future<List<Map<String, dynamic>>> getDataFromDatabase() async {
     final conn = await MySqlConnection.connect(ConnectionSettings(
-      host: '192.168.1.99',
+      host: '10.176.129.66',
       port: 3306,
       user: 'android',
       password: 'android',
@@ -172,7 +176,6 @@ class _HomePageState extends State<HomePage> {
     await conn.close();
     print(data);
     return data;
-
   }
 
   void main() async {
@@ -181,7 +184,11 @@ class _HomePageState extends State<HomePage> {
     print(jsonString);
   }
 
-  Future<void> ajoutVille() {
+  String testButton() {
+    return "Test";
+  }
+
+  Future<void> ajoutTournoi() {
     City? villeSaisie;
 
     return showDialog(
@@ -189,7 +196,7 @@ class _HomePageState extends State<HomePage> {
         builder: (BuildContext contextDialog) {
           return SimpleDialog(
             contentPadding: EdgeInsets.all(20),
-            title: Text("Ajoutez une ville"),
+            title: Text("Ajoutez un tournoi"),
             children: [
               TypeAheadField<City>(
                 itemBuilder: (context, citySuggestion) {
@@ -215,7 +222,7 @@ class _HomePageState extends State<HomePage> {
                       autofocus: true,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: 'Saisir une ville',
+                        labelText: 'Entrer les informations du tournoi',
                       ));
                 },
               ),

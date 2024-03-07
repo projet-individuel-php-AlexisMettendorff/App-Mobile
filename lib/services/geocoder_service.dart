@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:meteo/models/city.dart';
+import 'package:Locatournoi/models/city.dart';
 
 class GeocoderService {
   static Future<String> getCityFromCoordinates(

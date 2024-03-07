@@ -2,7 +2,7 @@ class City{
   String name;
   double latitude;
   double longitude;
-  String? display_name;// Pour le champ AutoComplete
+  String? display_name;
 
   City({
     required this.name,

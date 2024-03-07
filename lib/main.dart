@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
-import 'package:meteo/models/device_info.dart';
-import 'package:meteo/pages/home_page.dart';
-import 'package:meteo/services/geocoder_service.dart';
+import 'package:Locatournoi/models/device_info.dart';
+import 'package:Locatournoi/pages/home_page.dart';
+import 'package:Locatournoi/services/geocoder_service.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,10 +28,10 @@ void main() async{
     }
   }
 
-  //_locationData = await location.getLocation();
-  //DeviceInfo.longitude = _locationData.longitude;
-  //DeviceInfo.latitude = _locationData.latitude;
-  //DeviceInfo.ville = await GeocoderService.getCityFromCoordinates(latitude: _locationData.latitude!, longitude: _locationData.longitude!);
+  _locationData = await location.getLocation();
+  DeviceInfo.longitude = _locationData.longitude;
+  DeviceInfo.latitude = _locationData.latitude;
+  DeviceInfo.ville = await GeocoderService.getCityFromCoordinates(latitude: _locationData.latitude!, longitude: _locationData.longitude!);
 
 
   runApp(const MyApp());
